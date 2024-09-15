@@ -24,11 +24,9 @@
 - Node.js (Tailwind CSSを使う場合)
 
 ## セットアップ手順
-1. Pythonの仮想環境を作成し、Flaskをインストールします。
+1. Flaskをインストールします。
 
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # Windowsの場合は venv\Scripts ctivate
    pip install Flask
    ```
 
