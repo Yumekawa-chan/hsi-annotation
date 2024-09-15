@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Annotation Tool</title>
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 text-gray-900 font-sans">
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-8 text-center">画像アノテーションツール</h1>
+
+        <div id="image-container" class="flex justify-center mb-6">
+            <img id="image" src="" alt="Image" class="max-w-md border border-gray-300 shadow-md rounded-lg">
+        </div>
+
+        <div id="annotation-form" class="flex justify-center">
+            <input type="text" id="tags-input" class="p-2 border border-gray-300 rounded-lg w-96"
+                placeholder="タグをカンマ区切りで入力" />
+            <button id="next-btn" class="ml-4 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">次へ</button>
+        </div>
+    </div>
+
+    <script>
+        const images = JSON.parse('{{ image_files | tojson | safe }}');
+        let currentIndex = 0;
+
+        // ページロード時に最初の画像を読み込む
+        window.onload = function () {
+            document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
+        };
+
+        document.getElementById('next-btn').addEventListener('click', async function () {
+            const tagsInput = document.getElementById('tags-input').value;
+            const currentImage = images[currentIndex];
+
+            // タグを保存するためにAPIにリクエストを送る
+            const response = await fetch('/save_annotations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data_name: currentImage,
+                    tags: tagsInput.split(',')
+                })
+            });
+
+            if (response.ok) {
+                currentIndex++;
+                if (currentIndex >= images.length) {
+                    alert('全ての画像のアノテーションが完了しました！');
+                    return;
+                }
+                // 次の画像に切り替える
+                document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
+                document.getElementById('tags-input').value = '';
+            }
+        });
+    </script>
+</body>
+
+</html>

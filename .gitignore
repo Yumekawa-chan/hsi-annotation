@@ -1,0 +1,46 @@
+# Python関連
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Logファイル
+*.log
+
+# Flask関連
+instance/
+*.db
+*.sqlite3
+
+# タグ保存用のJSONファイル (必要に応じて無視)
+data.json
+
+# Tailwind CSSとNode.js関連
+node_modules/
+dist/
+build/
+*.map
+*.cache
+
+# npm関連ファイル
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# IDE/エディタ関連
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# その他
+.env               # 環境変数ファイル (必要に応じて)
+*.bak              # バックアップファイル
+*.tmp              # 一時ファイル
