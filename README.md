@@ -95,6 +95,9 @@ python app.py rgb-2024-07-31
 
 ブラウザで `http://127.0.0.1:5000` にアクセスして、アノテーションツールを利用できます。
 
+![image](https://github.com/user-attachments/assets/a049c5eb-94b2-4263-8fba-d2625828bb70)
+
+
 ## トラブルシューティング
 
 1. **画像が表示されない場合**：
