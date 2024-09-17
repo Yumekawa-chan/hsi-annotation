@@ -16,27 +16,103 @@
             <img id="image" src="" alt="Image" class="max-w-md border border-gray-300 shadow-md rounded-lg">
         </div>
 
-        <div id="annotation-form" class="flex justify-center">
-            <input type="text" id="tags-input" class="p-2 border border-gray-300 rounded-lg w-96"
-                placeholder="タグをカンマ区切りで入力" />
-            <button id="next-btn" class="ml-4 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">次へ</button>
+        <div class="mb-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">画像に写っているものをポチポチしてね</h2>
+            <div class="grid grid-cols-5 gap-2">
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag1">タグ1</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag2">タグ2</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag3">タグ3</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag4">タグ4</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag5">タグ5</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag6">タグ6</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag7">タグ7</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag8">タグ8</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag9">タグ9</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag10">タグ10</button>
+            </div>
         </div>
+
+        <div id="annotation-form" class="flex justify-center mb-4 space-x-2">
+            <input type="text" id="tags-input" class="p-2 border border-gray-300 rounded-lg w-96" readonly
+                placeholder="ここにタグが追加されます" />
+            <button id="reset-btn" class="p-2 ml-2 bg-blue-500 text-white rounded-lg hover:bg-gray-600">リセット</button>
+        </div>
+
+        <div class="flex justify-center mb-6">
+            <input type="text" id="other-tag-input" class="p-2 border border-gray-300 rounded-lg w-64"
+                placeholder="その他のタグを入力" />
+            <button id="add-other-tag-btn"
+                class="ml-2 p-2 bg-green-500 text-white rounded-lg hover:bg-green-600">追加</button>
+        </div>
+
+        <div id="error-message" class="text-red-500 text-center"></div>
+
+        <div class="flex justify-center space-x-4">
+            <button id="reject-btn" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">没データ</button>
+            <button id="next-btn" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">次のデータへ</button>
+        </div>
+
     </div>
 
     <script>
         const images = JSON.parse('{{ image_files | tojson | safe }}');
         let currentIndex = 0;
+        let tagsArray = [];
 
-        // ページロード時に最初の画像を読み込む
         window.onload = function () {
             document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
         };
 
-        document.getElementById('next-btn').addEventListener('click', async function () {
-            const tagsInput = document.getElementById('tags-input').value;
+        document.querySelectorAll('.tag-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const tag = this.getAttribute('data-tag');
+                if (!tagsArray.includes(tag)) {
+                    tagsArray.push(tag);
+                    updateTagsInput();
+                }
+            });
+        });
+
+        document.getElementById('add-other-tag-btn').addEventListener('click', function () {
+            const otherTag = document.getElementById('other-tag-input').value.trim();
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = '';
+
+            if (otherTag !== otherTag.toLowerCase()) {
+                errorMessage.textContent = 'タグは小文字で入力してください。';
+            } else if (otherTag.endsWith('s')) {
+                errorMessage.textContent = 'タグは単数形で入力してください。';
+            } else if (otherTag && !tagsArray.includes(otherTag)) {
+                tagsArray.push(otherTag);
+                updateTagsInput();
+                document.getElementById('other-tag-input').value = '';
+            }
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', function () {
+            tagsArray = [];
+            updateTagsInput();
+        });
+
+        function updateTagsInput() {
+            document.getElementById('tags-input').value = tagsArray.join(', ');
+        }
+
+        document.getElementById('reject-btn').addEventListener('click', function () {
+            const confirmation = confirm('本当に没データですか？');
+            if (confirmation) {
+                tagsArray = ['False'];
+                proceedToNext();
+            }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', function () {
+            proceedToNext();
+        });
+
+        async function proceedToNext() {
             const currentImage = images[currentIndex];
 
-            // タグを保存するためにAPIにリクエストを送る
             const response = await fetch('/save_annotations', {
                 method: 'POST',
                 headers: {
@@ -44,7 +120,7 @@
                 },
                 body: JSON.stringify({
                     data_name: currentImage,
-                    tags: tagsInput.split(',')
+                    tags: tagsArray
                 })
             });
 
@@ -54,11 +130,11 @@
                     alert('全ての画像のアノテーションが完了しました！');
                     return;
                 }
-                // 次の画像に切り替える
                 document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
-                document.getElementById('tags-input').value = '';
+                tagsArray = [];
+                updateTagsInput();
             }
-        });
+        }
     </script>
 </body>
 
