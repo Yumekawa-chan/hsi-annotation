@@ -43,7 +43,7 @@ image_files = [f'{args.image_folder}/{f}' for f in all_images if f'{args.image_f
 @app.route('/')
 def index():
     if not image_files:
-        return "No valid images to display."
+        return "本フォルダーは既にアノテーションが済んでいます．"
     return render_template('index.html', image_files=image_files)
 
 
