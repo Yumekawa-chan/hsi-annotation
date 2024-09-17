@@ -17,11 +17,6 @@ IMAGE_FOLDER = os.path.join('static', 'images', args.image_folder)
 if not os.path.exists(IMAGE_FOLDER):
     raise FileNotFoundError(f"The specified folder {IMAGE_FOLDER} does not exist.")
 
-# フォルダ内の画像リストを取得（jpgまたはpng形式）
-# "Dark"という文字列が含まれているファイルをスキップ
-image_files = [f'{args.image_folder}/{f}' for f in os.listdir(IMAGE_FOLDER)
-               if f.endswith(('.jpg', '.png')) and 'Dark' not in f]
-
 # タグを保存するJSONファイルのパス
 DATA_FILE = 'data.json'
 
@@ -29,6 +24,21 @@ DATA_FILE = 'data.json'
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w') as f:
         json.dump([], f)
+
+# 既にタグ付けされた画像のリストを取得
+with open(DATA_FILE, 'r') as f:
+    try:
+        annotations = json.load(f)
+        tagged_images = set([annotation['data_name'] for annotation in annotations])
+    except json.JSONDecodeError:
+        # data.json が空の場合
+        tagged_images = set()
+
+# フォルダ内の画像リストを取得（jpgまたはpng形式）
+# "Dark"という文字列が含まれているファイルをスキップ
+# 既にタグ付けされた画像もスキップ
+all_images = [f for f in os.listdir(IMAGE_FOLDER) if f.endswith(('.jpg', '.png')) and 'Dark' not in f]
+image_files = [f'{args.image_folder}/{f}' for f in all_images if f'{args.image_folder}/{f}' not in tagged_images]
 
 @app.route('/')
 def index():
