@@ -23,25 +23,36 @@
         <div class="mb-4 text-center">
             <div class="grid grid-cols-5 gap-2">
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag1">タグ1</button>
+                    data-tag="building">建物</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag2">タグ2</button>
+                    data-tag="glass">ガラス</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag3">タグ3</button>
+                    data-tag="road">道路</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag4">タグ4</button>
+                    data-tag="traffic-light">信号機</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag5">タグ5</button>
+                    data-tag="utility-pole">電柱</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag6">タグ6</button>
+                    data-tag="car">車</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag7">タグ7</button>
+                    data-tag="river">川</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag8">タグ8</button>
+                    data-tag="plant">草木</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag9">タグ9</button>
+                    data-tag="rock">岩</button>
                 <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
-                    data-tag="tag10">タグ10</button>
+                    data-tag="human">人間</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="bench">ベンチ</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="chair">椅子</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="table">テーブル</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="monitor">モニター</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="clock">時計</button>
+
             </div>
         </div>
 
@@ -72,12 +83,10 @@
         let currentIndex = 0;
         let tagsArray = [];
 
-        // ページ読み込み時に最初の画像を表示
         window.onload = function () {
             document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
         };
 
-        // タグボタンをクリックしたときの処理
         document.querySelectorAll('.tag-button').forEach(button => {
             button.addEventListener('click', function () {
                 const tag = this.getAttribute('data-tag');
@@ -88,13 +97,12 @@
             });
         });
 
-        // その他のタグを追加するボタンの処理
         document.getElementById('add-other-tag-btn').addEventListener('click', function () {
             const otherTag = document.getElementById('other-tag-input').value.trim();
             const errorMessage = document.getElementById('error-message');
             errorMessage.textContent = '';
 
-            const englishOnlyRegex = /^[a-zA-Z]+$/; // アルファベットのみの正規表現
+            const englishOnlyRegex = /^[a-zA-Z]+$/;
 
             if (!englishOnlyRegex.test(otherTag)) {
                 errorMessage.textContent = 'その他のタグはアルファベットのみ使用できます。';
@@ -109,18 +117,15 @@
             }
         });
 
-        // リセットボタンの処理
         document.getElementById('reset-btn').addEventListener('click', function () {
             tagsArray = [];
             updateTagsInput();
         });
 
-        // タグリストを更新する処理
         function updateTagsInput() {
             document.getElementById('tags-input').value = tagsArray.join(', ');
         }
 
-        // 没データボタンの処理
         document.getElementById('reject-btn').addEventListener('click', function () {
             const confirmation = confirm('本当に没データですか？');
             if (confirmation) {
@@ -129,7 +134,6 @@
             }
         });
 
-        // 次のデータへボタンの処理
         document.getElementById('next-btn').addEventListener('click', function () {
             const errorMessage = document.getElementById('error-message');
             if (tagsArray.length === 0) {
@@ -139,11 +143,10 @@
             }
         });
 
-        // データを保存して次の画像に進む処理
         async function proceedToNext() {
             const currentImage = images[currentIndex];
             const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = ''; // エラーメッセージをクリア
+            errorMessage.textContent = '';
 
             const response = await fetch('/save_annotations', {
                 method: 'POST',
