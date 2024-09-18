@@ -8,34 +8,41 @@
     <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 text-gray-900 font-sans">
+<body class="bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 text-gray-900 font-sans">
     <div class="container mx-auto p-8">
-        <h1 class="text-3xl font-bold mb-8 text-center">画像アノテーションツール</h1>
+        <h1
+            class="text-5xl font-extrabold mb-8 text-center bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+            画像アノテーションツール
+        </h1>
+
 
         <div id="image-container" class="flex justify-center mb-6">
             <img id="image" src="" alt="Image" class="max-w-md border border-gray-300 shadow-md rounded-lg">
         </div>
 
         <div class="mb-4 text-center">
-            <h2 class="text-2xl font-bold mb-4">画像に写っているものをポチポチしてね</h2>
             <div class="grid grid-cols-5 gap-2">
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag1">タグ1</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag2">タグ2</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag3">タグ3</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag4">タグ4</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag5">タグ5</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag6">タグ6</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag7">タグ7</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag8">タグ8</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag9">タグ9</button>
-                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded" data-tag="tag10">タグ10</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag1">タグ1</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag2">タグ2</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag3">タグ3</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag4">タグ4</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag5">タグ5</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag6">タグ6</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag7">タグ7</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag8">タグ8</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag9">タグ9</button>
+                <button class="tag-button bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 "
+                    data-tag="tag10">タグ10</button>
             </div>
-        </div>
-
-        <div id="annotation-form" class="flex justify-center mb-4 space-x-2">
-            <input type="text" id="tags-input" class="p-2 border border-gray-300 rounded-lg w-96" readonly
-                placeholder="ここにタグが追加されます" />
-            <button id="reset-btn" class="p-2 ml-2 bg-blue-500 text-white rounded-lg hover:bg-gray-600">リセット</button>
         </div>
 
         <div class="flex justify-center mb-6">
@@ -45,10 +52,16 @@
                 class="ml-2 p-2 bg-green-500 text-white rounded-lg hover:bg-green-600">追加</button>
         </div>
 
-        <div id="error-message" class="text-red-500 text-center"></div>
+        <div id="annotation-form" class="flex justify-center mb-4 space-x-2">
+            <input type="text" id="tags-input" class="p-2 border border-gray-300 rounded-lg w-96" readonly
+                placeholder="ここにタグが追加されます" />
+            <button id="reset-btn" class="p-2 ml-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">リセット</button>
+        </div>
+
+        <div id="error-message" class="text-red-500 text-center text-xl m-4"></div>
 
         <div class="flex justify-center space-x-4">
-            <button id="reject-btn" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">没データ</button>
+            <button id="reject-btn" class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">没データ</button>
             <button id="next-btn" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">次のデータへ</button>
         </div>
 
