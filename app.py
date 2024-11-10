@@ -7,13 +7,13 @@ from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
 parser = argparse.ArgumentParser(description="Start the image annotation tool.")
-parser.add_argument("image_folder", help="Specify the image folder within the static/images directory.")
+parser.add_argument("date_folder", help="Specify the date folder within the static/images directory.")
 args = parser.parse_args()
 
-IMAGE_FOLDER = os.path.join('static', 'images', args.image_folder)
+DATE_FOLDER = os.path.join('static', 'images', args.date_folder)
 
-if not os.path.exists(IMAGE_FOLDER):
-    raise FileNotFoundError(f"The specified folder {IMAGE_FOLDER} does not exist.")
+if not os.path.exists(DATE_FOLDER):
+    raise FileNotFoundError(f"The specified folder {DATE_FOLDER} does not exist.")
 
 # 日付をフォーマットしてファイル名に組み込む
 today_date = datetime.now().strftime("%Y%m%d")
@@ -24,15 +24,27 @@ if not os.path.exists(DATA_FILE):
         json.dump([], f)
 
 def get_image_files():
-    with open(DATA_FILE, 'r') as f:
-        try:
-            annotations = json.load(f)
-            tagged_images = set([annotation['data_name'] for annotation in annotations])
-        except json.JSONDecodeError:
-            tagged_images = set()
+    image_files = []
+    places = [d for d in os.listdir(DATE_FOLDER) if os.path.isdir(os.path.join(DATE_FOLDER, d))]
 
-    all_images = [f for f in os.listdir(IMAGE_FOLDER) if f.endswith(('.jpg', '.png')) and 'Dark' not in f]
-    image_files = [f'{args.image_folder}/{f}' for f in all_images if f'{args.image_folder}/{f}' not in tagged_images]
+    for place in places:
+        place_path = os.path.join(DATE_FOLDER, place)
+        images_in_place = [f for f in os.listdir(place_path) if f.endswith(('.jpg', '.png')) and 'Dark' not in f]
+        
+        with open(DATA_FILE, 'r') as f:
+            try:
+                annotations = json.load(f)
+                tagged_images = set([annotation['data_name'] for annotation in annotations])
+            except json.JSONDecodeError:
+                tagged_images = set()
+
+        for image in images_in_place:
+            image_path = f"static/images/{args.date_folder}/{place}/{image}"
+            if image_path not in tagged_images:
+                image_files.append({
+                    "place": place,
+                    "path": image_path
+                })
 
     return image_files
 
@@ -48,6 +60,7 @@ def save_annotations():
     data = request.json
     image_name = data['data_name']
     tags = data['tags']
+    place = data['place']
 
     try:
         with open(DATA_FILE, 'r') as f:
@@ -61,7 +74,8 @@ def save_annotations():
 
     annotations.append({
         "data_name": image_name,
-        "tags": tags
+        "tags": tags,
+        "place": place
     })
 
     with open(DATA_FILE, 'w') as f:

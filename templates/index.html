@@ -15,7 +15,6 @@
             画像アノテーションツール
         </h1>
 
-
         <div id="image-container" class="flex justify-center mb-6">
             <img id="image" src="" alt="Image" class="max-w-md border border-gray-300 shadow-md rounded-lg">
         </div>
@@ -83,7 +82,9 @@
         let tagsArray = [];
 
         window.onload = function () {
-            document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
+            if (images.length > 0) {
+                document.getElementById('image').src = images[currentIndex].path;
+            }
         };
 
         document.querySelectorAll('.tag-button').forEach(button => {
@@ -153,8 +154,9 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    data_name: currentImage,
-                    tags: tagsArray
+                    data_name: currentImage.path,
+                    tags: tagsArray,
+                    place: currentImage.place
                 })
             });
 
@@ -164,7 +166,7 @@
                     alert('全ての画像のアノテーションが完了しました！');
                     return;
                 }
-                document.getElementById('image').src = `/static/images/${images[currentIndex]}`;
+                document.getElementById('image').src = images[currentIndex].path;
                 tagsArray = [];
                 updateTagsInput();
             }
