@@ -15,7 +15,6 @@ DATE_FOLDER = os.path.join('static', 'images', args.date_folder)
 if not os.path.exists(DATE_FOLDER):
     raise FileNotFoundError(f"The specified folder {DATE_FOLDER} does not exist.")
 
-# 日付をフォーマットしてファイル名に組み込む
 today_date = datetime.now().strftime("%Y%m%d")
 DATA_FILE = f'data_{today_date}.json'
 
@@ -39,11 +38,11 @@ def get_image_files():
                 tagged_images = set()
 
         for image in images_in_place:
-            image_path = f"static/images/{args.date_folder}/{place}/{image}"
+            image_path = f"{args.date_folder}/{place}/{image}"
             if image_path not in tagged_images:
                 image_files.append({
                     "place": place,
-                    "path": image_path
+                    "path": f"static/images/{image_path}" 
                 })
 
     return image_files
