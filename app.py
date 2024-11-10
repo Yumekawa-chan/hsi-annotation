@@ -1,6 +1,7 @@
 import os
 import argparse
 import json
+from datetime import datetime
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -14,7 +15,9 @@ IMAGE_FOLDER = os.path.join('static', 'images', args.image_folder)
 if not os.path.exists(IMAGE_FOLDER):
     raise FileNotFoundError(f"The specified folder {IMAGE_FOLDER} does not exist.")
 
-DATA_FILE = 'data.json'
+# 日付をフォーマットしてファイル名に組み込む
+today_date = datetime.now().strftime("%Y%m%d")
+DATA_FILE = f'data_{today_date}.json'
 
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w') as f:
