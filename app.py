@@ -73,8 +73,9 @@ def save_annotations():
 
     annotations.append({
         "data_name": image_name,
-        "tags": [{"tag": tag, "status": "not review"} for tag in tags],
-        "place": place
+        "tags": tags,
+        "place": place,
+        "status": "not review"
     })
 
     with open(DATA_FILE, 'w') as f:
