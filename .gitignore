@@ -15,7 +15,7 @@ instance/
 *.sqlite3
 
 # タグ保存用のJSONファイル (必要に応じて無視)
-data.json
+data_*.json
 
 # Tailwind CSSとNode.js関連
 node_modules/
