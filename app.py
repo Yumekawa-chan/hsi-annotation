@@ -27,6 +27,31 @@ if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump([], f, ensure_ascii=False, indent=2)
 
+def extract_filename(path):
+    """
+    指定された文字列から最後のスラッシュ以降の部分を切り抜く関数。
+
+    Parameters:
+        path (str): 対象の文字列 (ファイルパスなど)。
+
+    Returns:
+        str: 最後のスラッシュ以降の部分。
+    """
+    # スラッシュで区切った最後の部分を返す
+    return path.split("/")[-1]       
+
+def extract_metadata(filename):
+    """
+    ファイル名からidとdatetimeを抽出する
+    """
+    try:
+        # ファイル名末尾の15文字を抽出 (例: 20240924_120431)
+        id_value = filename[-19:-4]  # ".jpg"または".png"を除外
+        datetime = id_value[:8]  # YYYYMMDD
+        return datetime, id_value
+    except IndexError:
+        return None, None
+
 def get_image_files():
     image_files = []
     # 各場所フォルダを取得
@@ -46,12 +71,12 @@ def get_image_files():
         images_in_place = [f for f in os.listdir(place_path) if f.endswith(('.jpg', '.png')) and 'Dark' not in f]
 
         for image in images_in_place:
-            # フルパス形式でチェック
-            image_path = f"static/images/{FULL_DATE_FOLDER}/{place}/{image}"
-            if image_path not in tagged_images:  # 既にアノテーションされた画像をスキップ
+            # ファイル名のみをチェック
+            if image not in tagged_images:  # 既にアノテーションされた画像をスキップ
                 image_files.append({
                     "place": place,
-                    "path": image_path  # フロントエンド用のパス
+                    "path": f"static/images/{FULL_DATE_FOLDER}/{place}/{image}",  # フロントエンド用のパス
+                    "file_name": image  # ファイル名のみ
                 })
 
     return image_files
@@ -66,9 +91,12 @@ def index():
 @app.route('/save_annotations', methods=['POST'])
 def save_annotations():
     data = request.json
-    image_name = data['data_name']
+    image_name = data['data_name']  # ファイル名のみ
     tags = data['tags']
     place = data['place']
+
+    # メタデータを抽出
+    datetime, id_value = extract_metadata(image_name)
 
     try:
         with open(DATA_FILE, 'r', encoding='utf-8') as f:
@@ -107,9 +135,11 @@ def save_annotations():
             }
 
             annotations.append({
-                "data_name": image_name,
+                "data_name": extract_filename(image_name),  # ファイル名のみ
+                "datetime": datetime,     # YYYYMMDD
+                "id": id_value,           # YYYYMMDD_HHMMSS
                 "scene-tags": scene_tags,
-                "place": place,
+                "location": place,
             })
 
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
