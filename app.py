@@ -32,26 +32,26 @@ def get_image_files():
     # 各場所フォルダを取得
     places = [d for d in os.listdir(DATE_FOLDER) if os.path.isdir(os.path.join(DATE_FOLDER, d))]
 
+    # 既にアノテーション済みの画像を取得
+    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+        try:
+            annotations = json.load(f)
+            tagged_images = set([annotation['data_name'] for annotation in annotations])
+        except json.JSONDecodeError:
+            tagged_images = set()
+
     for place in places:
         place_path = os.path.join(DATE_FOLDER, place)
         # 画像ファイルを取得（.jpg または .png で、ファイル名に 'Dark' を含まないもの）
         images_in_place = [f for f in os.listdir(place_path) if f.endswith(('.jpg', '.png')) and 'Dark' not in f]
-        
-        # 既にアノテーション済みの画像を取得
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            try:
-                annotations = json.load(f)
-                tagged_images = set([annotation['data_name'] for annotation in annotations])
-            except json.JSONDecodeError:
-                tagged_images = set()
 
         for image in images_in_place:
-            # 正しいパス形式に修正
-            image_path = f"{FULL_DATE_FOLDER}/{place}/{image}"
-            if image_path not in tagged_images:
+            # フルパス形式でチェック
+            image_path = f"static/images/{FULL_DATE_FOLDER}/{place}/{image}"
+            if image_path not in tagged_images:  # 既にアノテーションされた画像をスキップ
                 image_files.append({
                     "place": place,
-                    "path": f"static/images/{image_path}"  # フロントエンド用のパス
+                    "path": image_path  # フロントエンド用のパス
                 })
 
     return image_files
@@ -60,7 +60,7 @@ def get_image_files():
 def index():
     image_files = get_image_files()
     if not image_files:
-        return "本フォルダーは既にアノテーションが済んでいます．"
+        return "全ての画像がアノテーション済みです．"
     return render_template('index.html', image_files=image_files)
 
 @app.route('/save_annotations', methods=['POST'])
@@ -80,12 +80,37 @@ def save_annotations():
     except (FileNotFoundError, json.JSONDecodeError):
         annotations = []
 
-    annotations.append({
-        "data_name": image_name,  # 'RGB-08022024/place/image.jpg'
-        "tags": tags,
-        "place": place,
-        "status": "not review"
-    })
+    for tag in tags:
+        category, sub_category, tag_name = None, None, None
+
+        # タグの解析: 正しいフォーマットを確認
+        try:
+            for part in tag.split(","):
+                if ":" in part:
+                    key, value = part.strip().split(":")
+                    if key.strip() == "category":
+                        category = value.strip()
+                    elif key.strip() == "sub-category":
+                        sub_category = value.strip()
+                    elif key.strip() == "tag":
+                        tag_name = value.strip()
+        except ValueError:
+            # フォーマットが不正な場合、スキップ
+            continue
+
+        # scene-tags にデータを追加
+        if category and sub_category and tag_name:
+            scene_tags = {
+                "category": category,
+                "sub-category": sub_category,
+                "tags": tag_name,
+            }
+
+            annotations.append({
+                "data_name": image_name,
+                "scene-tags": scene_tags,
+                "place": place,
+            })
 
     with open(DATA_FILE, 'w', encoding='utf-8') as f:
         json.dump(annotations, f, indent=2, ensure_ascii=False)
@@ -93,4 +118,4 @@ def save_annotations():
     return jsonify({"status": "success"}), 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
